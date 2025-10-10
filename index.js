@@ -20,7 +20,6 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: "https://day-to-day-frontend.vercel.app",
-    methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
     credentials: true,
   })
 );
