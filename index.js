@@ -19,7 +19,7 @@ const rejectedRouter = require("./routes/RejectedProviderRoute");
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["https://day-to-day-frontend.vercel.app/", "http://localhost:5173"],
+    origin: ["https://day-to-day-frontend.vercel.app", "http://localhost:5173"],
     credentials: true,
   })
 );
