@@ -6,7 +6,7 @@ const app = express();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/UsersRoutes");
-// const refresTokenRouter = require("./routes/RefreshTokenRoute");
+const refresTokenRouter = require("./routes/RefreshTokenRoute");
 const providersRouter = require("./routes/ProviderRoutes");
 const customerRouter = require("./routes/CustomerRequestRoutes");
 const compalintsRouter = require("./routes/ComplaintsRoutes");
@@ -19,10 +19,7 @@ const rejectedRouter = require("./routes/RejectedProviderRoute");
 app.use(cookieParser());
 app.use(
   cors({
-    origin: [
-      "https://day-to-day-frontend.vercel.app",
-      "http://localhost:5173",
-    ],
+    origin: ["https://day-to-day-frontend.vercel.app/", "http://localhost:5173"],
     credentials: true,
   })
 );
@@ -41,7 +38,7 @@ mongoose
 
 // All Routes
 app.use("/users", userRouter);
-// app.use(refresTokenRouter);
+app.use("/api", refresTokenRouter);
 app.use("/providers", providersRouter);
 app.use(customerRouter);
 app.use(compalintsRouter);

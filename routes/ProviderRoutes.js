@@ -7,7 +7,7 @@ const {
   providerUnderReview,
   buyCustomerContact,
 } = require("../controllers/Providers");
-const { verifyToken } = require("../services/Auth");
+const { verifyToken } = require("../libs/auth/generateToken");
 
 providersRouter.post("/profileCreation", profiderProfileCreation);
 providersRouter.get("/profile/:id", verifyToken, providerProfile);

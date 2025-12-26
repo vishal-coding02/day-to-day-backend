@@ -1,6 +1,6 @@
 const express = require("express");
 const refresTokenRouter = express.Router();
-const { refreshToken } = require("../services/Auth");
+const { refreshToken } = require("../libs/auth/generateToken");
 
 refresTokenRouter.post("/refreshToken", refreshToken);
 

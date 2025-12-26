@@ -1,14 +1,23 @@
 const Users = require("../models/UserModel");
 const Address = require("../models/AddressModel");
 const Providers = require("../models/ProviderModel");
-const { bcryptjs, generateToken } = require("../services/Auth");
+const { generateToken } = require("../libs/auth/generateToken");
+const bcryptjs = require("bcryptjs");
+const { sendOTPEmail } = require("../libs/email/sendEmail");
+
 
 async function signUp(req, res) {
   try {
     console.log(req.body);
     const { name, phone, password, userType, address, email } = req.body;
+    console.log(req.body);
 
     const hashPass = await bcryptjs.hash(password, 10);
+
+    const verificationCode = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+
     const newUser = await Users.create({
       userName: name,
       userPhone: phone,
@@ -16,7 +25,16 @@ async function signUp(req, res) {
       userPassword: hashPass,
       userAddress: address,
       userType: userType,
-      createdAt: new Date(),
+      isVerified: false,
+      verificationCode,
+    });
+
+    console.log("new user", newUser);
+
+    await sendOTPEmail({
+      toEmail: newUser.userEmail,
+      userName: newUser.userName,
+      verificationCode,
     });
 
     res.status(201).json({
@@ -24,7 +42,6 @@ async function signUp(req, res) {
       type: newUser.userType,
       userId: newUser._id,
     });
-    console.log("user craeted...", newUser);
   } catch (err) {
     console.error("Signup error:", err.message);
     res.status(500).json({ error: "Internal server error" });
@@ -54,26 +71,27 @@ async function login(req, res) {
     return res.status(404).json({ message: "Provider not found" });
   }
 
-  const isMatch = await bcryptjs.compare(req.body.password, user.userPassword);
+  const isMatch = await bcryptjs.compare(password, user.userPassword);
   if (!isMatch) {
     console.log("Invalid credentials");
     return res.status(401).send("Incorrect password");
   }
 
   const { accessToken, refreshToken } = generateToken(user);
-  // console.log("Setting cookie with refreshToken:", refreshToken);
-  // res.cookie("refreshToken", refreshToken, {
-  //   httpOnly: true,
-  //   secure: false,
-  //   sameSite: "lax",
-  //   path: "/",
-  // });
-  // console.log("Set-Cookie header:", res.getHeaders()["set-cookie"]);
+  console.log("Setting cookie with refreshToken:", refreshToken);
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+    path: "/",
+  });
+  console.log("Set-Cookie header:", res.getHeaders()["set-cookie"]);
   res.json({
-    token: accessToken,
+    accessToken: accessToken,
     userID: user._id,
     providerStatus: provider ? provider.status : null,
     userType: user.userType,
+    isLoggedIn: true,
   });
 }
 
@@ -132,9 +150,21 @@ async function addAddress(req, res) {
   }
 }
 
+async function logout(req, res) {
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: false, // prod me true
+    sameSite: "lax",
+    path: "/",
+  });
+
+  return res.status(200).json({ message: "Logged out" });
+}
+
 module.exports = {
   signUp,
   login,
   userProfile,
   addAddress,
+  logout
 };

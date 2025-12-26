@@ -1,6 +1,6 @@
 const express = require("express");
 const adminRouter = express.Router();
-const { verifyToken } = require("../services/Auth");
+const { verifyToken } = require("../libs/auth/generateToken");
 const {
   allUsers,
   pendingProviders,

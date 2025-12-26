@@ -75,7 +75,7 @@ async function findProviders(req, res) {
     }
 
     const { name, serviceType, priceRange } = req.query;
-    let filter = { status: "approve" };
+    let filter = { status: "approved" };
 
     if (priceRange && priceRange !== "all") {
       if (priceRange === "inr_low") {

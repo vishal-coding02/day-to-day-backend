@@ -3,7 +3,7 @@ const Users = require("../models/UserModel");
 const CustomerRequest = require("../models/CustomerModel");
 const CustomerContact = require("../models/CustomerContactModel");
 const Coins = require("../models/CoinsModel");
-const cloudinary = require("../cloudinary");
+const cloudinary = require("../libs/cloudinary");
 
 async function profiderProfileCreation(req, res) {
   try {

@@ -1,6 +1,6 @@
 const express = require("express");
 const coinsRouter = express.Router();
-const { verifyToken } = require("../services/Auth");
+const { verifyToken } = require("../libs/auth/generateToken");
 const {
   purchaseCoin,
   fetchCoins,
