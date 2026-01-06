@@ -3,15 +3,12 @@ const userRouter = express.Router();
 const {
   signUp,
   login,
-  userProfile,
   addAddress,
   logout
-} = require("../controllers/Users");
-const { verifyToken } = require("../libs/auth/generateToken");
+} = require("../controllers/user.controller");
 
 userRouter.post("/signUp", signUp);
 userRouter.post("/login", login);
-userRouter.get("/profile", verifyToken, userProfile);
 userRouter.post("/address", addAddress);
 userRouter.post("/logout", logout)
 

@@ -1,6 +1,6 @@
 const { transporter } = require("../email/transporter");
 const { Approval_Email_Template } = require("./templates/approvalTemplate");
-const { Rejection_Email_Template } = require("./templates/reApprovalTemplate");
+const { Rejection_Email_Template } = require("../email/templates/rejectTemplate");
 const { OTP_Email_Template } = require("./templates/otpTemplate");
 
 async function sendApprovalEmail(toEmail, userName) {
@@ -14,7 +14,7 @@ async function sendApprovalEmail(toEmail, userName) {
   const mailOptions = {
     from: process.env.SMTP_EMAIL_FROM,
     to: toEmail,
-    subject: "✅ Your Account is Approved - Login Now",
+    subject: "Your Account is Approved - Login Now",
     text: `Hello ${userName},\n\nYour provider account has been approved. You can now login and start accepting service requests.\n\nLogin here: ${loginLink}\n\nBest regards,\nYourService Team`,
     html: htmlContent,
   };
@@ -33,13 +33,13 @@ async function sendRejectionEmail(toEmail, userName, reason) {
   const htmlContent = Rejection_Email_Template.replace(
     "{userName}",
     userName
-  ).replace("{reason}", reason);
+  ).replace("{reason}", reason || "Not specified");
 
   const mailOptions = {
     from: process.env.SMTP_EMAIL_FROM,
     to: toEmail,
     subject: "Application Status: Not Approved",
-    text: `Dear ${userName},\n\nThank you for your interest in becoming a service provider with us.\n\nAfter careful review, we are unable to approve your provider account application at this time.\n\nReason: ${reason}\n\nWe appreciate the time you took to complete the application process.\n\nBest regards,\nYourService Team`,
+    text: `Dear ${userName},\n\nReason: ${reason}`,
     html: htmlContent,
   };
 
@@ -49,7 +49,7 @@ async function sendRejectionEmail(toEmail, userName, reason) {
     return true;
   } catch (error) {
     console.error("Error sending rejection email:", error);
-    return false;
+    throw new Error("Email sending failed"); 
   }
 }
 
@@ -59,7 +59,7 @@ async function sendOTPEmail({
   verificationCode,
   expiryMinutes = 10,
 }) {
-  console.log(toEmail, userName, verificationCode)
+  console.log(toEmail, userName, verificationCode);
   const htmlContent = OTP_Email_Template.replace("{userName}", userName)
     .replace("{verificationCode}", verificationCode)
     .replace("{expiryTime}", expiryMinutes);

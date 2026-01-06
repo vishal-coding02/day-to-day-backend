@@ -10,7 +10,7 @@ function generateToken(user) {
       type: user.userType,
     },
     JWT_ACCESS_SECRET_KEY,
-    { expiresIn: "5m" }
+    { expiresIn: "15m" }
   );
   console.log(accessToken);
   const refreshToken = jwt.sign(
@@ -20,7 +20,7 @@ function generateToken(user) {
       type: user.userType,
     },
     JWT_REFRESH_SECRET_KEY,
-    { expiresIn: "10m" }
+    { expiresIn: "7d" }
   );
   console.log(refreshToken);
 
@@ -67,7 +67,7 @@ async function refreshToken(req, res) {
         type: payload.type,
       },
       JWT_ACCESS_SECRET_KEY,
-      { expiresIn: "5m" }
+      { expiresIn: "15m" }
     );
     res.json({ accessToken: newAccessToken });
   } catch {
