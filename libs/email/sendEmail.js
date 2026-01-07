@@ -1,3 +1,4 @@
+require("dotenv").config()
 const { transporter } = require("../email/transporter");
 const { Approval_Email_Template } = require("./templates/approvalTemplate");
 const { Rejection_Email_Template } = require("../email/templates/rejectTemplate");

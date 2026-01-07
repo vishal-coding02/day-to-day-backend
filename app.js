@@ -35,6 +35,6 @@ app.use(otpRouter);
 app.use("/admin", adminRouter);
 app.use("/packages", packageRouter);
 app.use(coinsRouter);
-app.use(rejectedRouter);
+app.use(rejectedRouter); 
 
 module.exports = app;
