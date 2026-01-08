@@ -63,8 +63,8 @@ async function loginUser(data, res) {
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
   });
 
   return { accessToken, user, provider };
