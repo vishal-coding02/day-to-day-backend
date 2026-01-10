@@ -71,7 +71,7 @@ async function findProviders(filters) {
     throw new Error("Providers not found");
   }
 
-  return { providers };
+  return providers;
 }
 
 async function customerProfile(id) {
