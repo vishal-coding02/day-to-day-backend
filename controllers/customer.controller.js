@@ -52,11 +52,12 @@ async function searchProvidersController(req, res) {
     });
   }
   try {
-    const { providers } = await findProviders(req.query);
-    res.status(200).json({
+    const result = await findProviders(req.query);
+    console.log(result);
+    return res.status(200).json({
       success: true,
       message: "Providers fetched successfully",
-      data: providers,
+      data: result,
     });
   } catch (err) {
     if (err.message === "Providers not found") {
@@ -76,9 +77,10 @@ async function customerProfileController(req, res) {
 
   try {
     const { id } = req.params;
+    console.log(id);
     const { customer } = await customerProfile(id);
-
-    res.status(200).json({
+    console.log(customer);
+    return res.status(200).json({
       message: "customer profile fetched successfully",
       data: customer,
     });

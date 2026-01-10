@@ -17,6 +17,7 @@ const coinsRouter = require("./routes/CoinsRoutes");
 const rejectedRouter = require("./routes/RejectedProviderRoute");
 
 app.use(cookieParser());
+
 app.use(
   cors({
     origin: [process.env.FRONTEND_URL, "http://localhost:5173"],
@@ -42,7 +43,7 @@ mongoose
 app.use("/users", userRouter);
 app.use("/api", refresTokenRouter);
 app.use("/providers", providersRouter);
-app.use(customerRouter);
+app.use("/customers", customerRouter);
 app.use(compalintsRouter);
 app.use(otpRouter);
 app.use("/admin", adminRouter);
