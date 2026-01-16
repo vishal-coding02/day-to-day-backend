@@ -1,8 +1,11 @@
-require("dotenv").config()
+require("dotenv").config();
 const { transporter } = require("../email/transporter");
 const { Approval_Email_Template } = require("./templates/approvalTemplate");
-const { Rejection_Email_Template } = require("../email/templates/rejectTemplate");
+const {
+  Rejection_Email_Template,
+} = require("../email/templates/rejectTemplate");
 const { OTP_Email_Template } = require("./templates/otpTemplate");
+const { ResetPass_OTP_Email_Template } = require("./templates/resetPassOtp");
 
 async function sendApprovalEmail(toEmail, userName) {
   const loginLink = "https://day-to-day-frontend.vercel.app/login";
@@ -50,7 +53,7 @@ async function sendRejectionEmail(toEmail, userName, reason) {
     return true;
   } catch (error) {
     console.error("Error sending rejection email:", error);
-    throw new Error("Email sending failed"); 
+    throw new Error("Email sending failed");
   }
 }
 
@@ -83,4 +86,47 @@ async function sendOTPEmail({
   }
 }
 
-module.exports = { sendApprovalEmail, sendRejectionEmail, sendOTPEmail };
+async function sendResetPassOtpEmail({
+  toEmail,
+  userName,
+  verificationCode,
+  expiryTime,
+}) {
+  console.log(
+    "Sending reset password OTP email:",
+    toEmail,
+    userName,
+    verificationCode
+  );
+
+  const htmlContent = ResetPass_OTP_Email_Template.replace(
+    "{userName}",
+    userName
+  )
+    .replace("{verificationCode}", verificationCode)
+    .replace("{expiryTime}", expiryTime);
+
+  const mailOptions = {
+    from: process.env.SMTP_EMAIL_FROM,
+    to: toEmail,
+    subject: `Password Reset OTP: ${verificationCode} - Valid for ${expiryTime} minutes`,
+    text: `Hello ${userName},\n\nYour One-Time Password (OTP) for password reset is:\n\n${verificationCode}\n\nThis OTP will expire in ${expiryTime} minutes.\n\nEnter this code on the password reset page to continue.\n\nNever share this OTP with anyone. ServiceHub will never ask for your OTP.\n\nIf you didn't request this password reset, please ignore this email.\n\nBest regards,\nServiceHub Team`,
+    html: htmlContent,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Reset password OTP email sent successfully to:", toEmail);
+    return true;
+  } catch (error) {
+    console.error("Error sending reset password OTP email:", error);
+    return false;
+  }
+}
+
+module.exports = {
+  sendApprovalEmail,
+  sendRejectionEmail,
+  sendOTPEmail,
+  sendResetPassOtpEmail,
+};
