@@ -2,7 +2,9 @@ const {
   signUpUser,
   loginUser,
   addUserAddress,
-} = require("../services/user.service");
+  searchUsersService,
+  resetPasswordService,
+} = require("../services/auth.service");
 
 async function signUp(req, res) {
   try {
@@ -94,9 +96,94 @@ async function logout(req, res) {
   }
 }
 
+const searchUsersController = async (req, res) => {
+  try {
+    const phone = String(req.query.phone);
+
+    const result = await searchUsersService(phone);
+
+    if (result.error) {
+      return res.status(404).json({
+        success: false,
+        message: result.error,
+      });
+    }
+
+    if (result.user.userType === "customer") {
+      return res.status(200).json({
+        success: true,
+        data: result.user,
+        authUserId: result.user._id,
+        message: "Customer fetched successfully",
+      });
+    }
+
+    if (result.user.userType === "provider") {
+      return res.status(200).json({
+        success: true,
+        data: result.provider,
+        authUserId: result.user._id,
+        message: "Provider fetched successfully",
+      });
+    }
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const resetPasswordController = async (req, res) => {
+  try {
+    console.log("RESET PASSWORD BODY:", req.body);
+    const { phone, newPassword, confirmPassword } = req.body;
+
+    await resetPasswordService({ phone, newPassword, confirmPassword });
+    return res.status(200).json({
+      success: true,
+      message: "Password reset successful",
+    });
+  } catch (err) {
+    if (err.message === "Password required") {
+      return res.status(400).json({
+        success: false,
+        message: err.message,
+      });
+    }
+    if (err.message === "Passwords do not match") {
+      return res.status(400).json({
+        success: false,
+        message: err.message,
+      });
+    }
+
+    if (err.message === "User not found") {
+      return res.status(404).json({
+        success: false,
+        message: err.message,
+      });
+    }
+
+    if (err.message === "OTP verification required") {
+      return res.status(403).json({
+        success: false,
+        message: err.message,
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 module.exports = {
   signUp,
   login,
   addAddress,
   logout,
+  searchUsersController,
+  resetPasswordController,
 };

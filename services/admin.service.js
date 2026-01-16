@@ -3,7 +3,7 @@ const Providers = require("../models/ProviderModel");
 const {
   sendApprovalEmail,
   sendRejectionEmail,
-} = require("../libs/email/sendEmail");
+} = require("../utils/email/sendEmail");
 const RejectedProvider = require("../models/RejectedProviderModel");
 
 async function getAllUsersController() {

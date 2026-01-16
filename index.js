@@ -5,7 +5,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const userRouter = require("./routes/user.routes");
+const authRouter = require("./routes/auth.routes");
 const refresTokenRouter = require("./routes/RefreshTokenRoute");
 const providersRouter = require("./routes/provider.routes");
 const customerRouter = require("./routes/customer.routes");
@@ -40,7 +40,7 @@ mongoose
   .catch((err) => console.error(err));
 
 // All Routes
-app.use("/users", userRouter);
+app.use("/auth", authRouter);
 app.use("/api", refresTokenRouter);
 app.use("/providers", providersRouter);
 app.use("/customers", customerRouter);

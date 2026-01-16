@@ -3,7 +3,7 @@ const Providers = require("../models/ProviderModel");
 const Address = require("../models/AddressModel");
 const bcrypt = require("bcryptjs");
 const { generateToken } = require("../libs/auth/generateToken");
-const { sendOTPEmail } = require("../libs/email/sendEmail");
+const { sendOTPEmail } = require("../utils/email/sendEmail");
 
 async function signUpUser(data) {
   const { name, phone, email, password, userType, address } = data;
@@ -31,6 +31,7 @@ async function signUpUser(data) {
     userType: userType,
     isVerified: false,
     verificationCode,
+    otpPurpose: "EMAIL_VERIFY",
   });
 
   await sendOTPEmail({
@@ -93,8 +94,62 @@ async function addUserAddress(data) {
   return true;
 }
 
+async function searchUsersService(phone) {
+  const user = await Users.findOne({ userPhone: phone });
+
+  if (!user) {
+    return { error: "USER_NOT_FOUND" };
+  }
+
+  if (user.userType === "customer") {
+    return { user };
+  }
+
+  const provider = await Providers.findOne({ userID: user._id });
+
+  if (!provider) {
+    return { error: "PROVIDER_NOT_FOUND" };
+  }
+
+  return { user, provider };
+}
+
+async function resetPasswordService({ phone, newPassword, confirmPassword }) {
+  if (!newPassword || !confirmPassword) {
+    throw new Error("Password required");
+  }
+
+  if (newPassword !== confirmPassword) {
+    throw new Error("Passwords do not match");
+  }
+
+  const user = await Users.findOne({ userPhone: String(phone) });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  if (!user.resetPasswordAllowed) {
+    throw new Error("OTP verification required");
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  user.userPassword = hashedPassword;
+  user.resetPasswordAllowed = false;
+  user.verificationCode = undefined;
+  user.otpExpiry = undefined;
+  user.otpPurpose = undefined;
+
+  await user.save();
+
+  return true;
+}
+
 module.exports = {
   signUpUser,
   loginUser,
   addUserAddress,
+  searchUsersService,
+  resetPasswordService,
 };
