@@ -1,6 +1,6 @@
 const Users = require("../models/UserModel");
 const { sendResetPassOtpEmail } = require("../utils/email/sendEmail");
-const OTP_EXPIRY_MINUTES = 10;
+const OTP_EXPIRY_MINUTES = 2;
 
 const verifyEmail = async (req, res) => {
   try {
