@@ -1,6 +1,7 @@
 const Users = require("../models/UserModel");
 const CustomerRequests = require("../models/CustomerModel");
 const Providers = require("../models/ProviderModel");
+const client = require("../libs/redisClient");
 
 async function createCustomerRequest(data, userId) {
   const { name, price, media, serviceType, location, description } = data;
@@ -75,16 +76,27 @@ async function findProviders(filters) {
 }
 
 async function customerProfile(id) {
+  const cacheKey = `customer:${id}`;
+
+  const cachedCustomer = await client.get(cacheKey);
+  if (cachedCustomer) {
+    console.log("Cache se aaya");
+    return JSON.parse(cachedCustomer);
+  }
+
   const customer = await Users.findById(id).populate(
     "providerContactList",
-    "userName userPhone profilePic"
+    "userName userPhone profilePic",
   );
 
   if (!customer) {
     throw new Error("customer not found");
   }
 
-  return { customer };
+  await client.setEx(cacheKey, 3600, JSON.stringify(customer));
+
+  console.log("DB se aaya");
+  return customer;
 }
 
 module.exports = {

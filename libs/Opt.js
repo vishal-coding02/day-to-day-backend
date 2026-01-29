@@ -5,6 +5,8 @@ const OTP_EXPIRY_MINUTES = 2;
 const verifyEmail = async (req, res) => {
   try {
     const { otp, purpose } = req.body;
+    console.log("OTP from frontend:", otp);
+    console.log("Purpose from frontend:", purpose);
 
     const user = await Users.findOne({
       verificationCode: otp,
@@ -56,7 +58,7 @@ const generateOTP = async (req, res) => {
     }
 
     const verificationCode = Math.floor(
-      100000 + Math.random() * 900000
+      100000 + Math.random() * 900000,
     ).toString();
 
     const expiryTime = new Date();
