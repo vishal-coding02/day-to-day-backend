@@ -24,7 +24,7 @@ async function getProviderProfile(req, res) {
   try {
     if (req.user.type === "provider" || req.user.type === "customer") {
       const { id } = req.params;
-      const { provider } = await fetchProviderProfile(id);
+      const provider  = await fetchProviderProfile(id);
       return res.status(200).json({ providerData: provider });
     } else {
       return res.status(403).json({

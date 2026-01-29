@@ -19,8 +19,11 @@ async function signUpUser(data) {
   const hashPass = await bcrypt.hash(password, 10);
 
   const verificationCode = Math.floor(
-    100000 + Math.random() * 900000
+    100000 + Math.random() * 900000,
   ).toString();
+
+  const expiryTime = new Date();
+  expiryTime.setMinutes(expiryTime.getMinutes() + 2);
 
   const user = await Users.create({
     userName: name,
@@ -32,6 +35,7 @@ async function signUpUser(data) {
     isVerified: false,
     verificationCode,
     otpPurpose: "EMAIL_VERIFY",
+    otpExpiry: expiryTime,
   });
 
   await sendOTPEmail({

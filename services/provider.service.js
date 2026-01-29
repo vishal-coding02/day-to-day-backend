@@ -4,6 +4,7 @@ const CustomerRequest = require("../models/CustomerModel");
 const CustomerContact = require("../models/CustomerContactModel");
 const Coins = require("../models/CoinsModel");
 const cloudinary = require("../libs/cloudinary");
+const client = require("../libs/redisClient");
 
 async function createProviderProfileService(data) {
   const {
@@ -61,6 +62,14 @@ async function createProviderProfileService(data) {
 }
 
 async function fetchProviderProfile(id) {
+  const cacheKey = `provider:${id}`;
+
+  const cachedProvider = await client.get(cacheKey);
+  if (cachedProvider) {
+    console.log("Cache se aaya");
+    return JSON.parse(cachedProvider);
+  }
+
   const provider = await Providers.findOne({
     userID: id,
   }).populate("userID", "userName userAddress userPhone");
@@ -68,7 +77,11 @@ async function fetchProviderProfile(id) {
   if (!provider) {
     throw new Error("Provider not found");
   }
-  return { provider };
+
+  await client.setEx(cacheKey, 3600, JSON.stringify(provider));
+
+  console.log("DB se aaya");
+  return provider;
 }
 
 async function checkProviderUnderReviewStatus(userId) {

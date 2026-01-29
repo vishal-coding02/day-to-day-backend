@@ -61,7 +61,6 @@ async function myPackages(req, res) {
       res.status(404).json({ error: "packages not found" });
     } else {
       res.status(200).json({ myPackages: packages });
-      console.log(packages);
     }
   } catch (err) {
     console.log("Provider Packages Error :", err.message);

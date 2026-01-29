@@ -78,7 +78,7 @@ async function customerProfileController(req, res) {
   try {
     const { id } = req.params;
     console.log(id);
-    const { customer } = await customerProfile(id);
+    const customer  = await customerProfile(id);
     console.log(customer);
     return res.status(200).json({
       message: "customer profile fetched successfully",

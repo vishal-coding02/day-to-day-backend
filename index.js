@@ -15,6 +15,8 @@ const adminRouter = require("./routes/admin.routes");
 const packageRouter = require("./routes/ServicesPackageRoutes");
 const coinsRouter = require("./routes/CoinsRoutes");
 const rejectedRouter = require("./routes/RejectedProviderRoute");
+const apiLimiter  = require("./middleware/rateLimiter")
+const helmet = require("helmet")
 
 app.use(cookieParser());
 
@@ -27,13 +29,16 @@ app.use(
   })
 );
 
+app.use(helmet())
+app.use(apiLimiter)
+
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 // Server Port
 const PORT = process.env.PORT;
 
-// Server connection
+// DataBase connection
 mongoose
   .connect(process.env.MONGODB_URL)
   .then(() => console.log("Connected to MongoDB"))
@@ -50,6 +55,8 @@ app.use("/admin", adminRouter);
 app.use("/packages", packageRouter);
 app.use(coinsRouter);
 app.use(rejectedRouter);
+
+// Server connection
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
