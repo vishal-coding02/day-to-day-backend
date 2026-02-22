@@ -15,22 +15,22 @@ const adminRouter = require("./routes/admin.routes");
 const packageRouter = require("./routes/ServicesPackageRoutes");
 const coinsRouter = require("./routes/CoinsRoutes");
 const rejectedRouter = require("./routes/RejectedProviderRoute");
-const apiLimiter  = require("./middleware/rateLimiter")
-const helmet = require("helmet")
+const apiLimiter = require("./middleware/rateLimiter");
+const helmet = require("helmet");
 
 app.use(cookieParser());
 
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL, "http://localhost:5173"],
+    origin: process.env.FRONTEND_URL,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  }),
 );
 
-app.use(helmet())
-app.use(apiLimiter)
+app.set("trust proxy", 1);
+app.use(helmet());
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
@@ -42,7 +42,14 @@ const PORT = process.env.PORT;
 mongoose
   .connect(process.env.MONGODB_URL)
   .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error(err));
+  .catch((err) => console.error(err.message));
+
+// Rate Limit Routes
+
+app.use("/auth/login", apiLimiter);
+app.use("/auth/signUp", apiLimiter);
+app.use("/auth/reset-password", apiLimiter);
+app.use("/auth/search-user", apiLimiter);
 
 // All Routes
 app.use("/auth", authRouter);
