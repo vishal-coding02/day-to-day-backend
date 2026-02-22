@@ -6,7 +6,7 @@ const {
   fetchCoins,
   deductCoins,
   unlockedContact,
-} = require("../controllers/Coins");
+} = require("../controllers/coins.controller");
 
 coinsRouter.post("/buyCoins", verifyToken, purchaseCoin);
 coinsRouter.get("/coins", verifyToken, fetchCoins);
